@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Jenssegers\Mongodb\Eloquent\Model;
 
 class Product extends Model
 {
+    use HasFactory;
     protected $fillable=[
-        'Nombre', 'Precio','Categoría','Descripción','Imagen'
-    ]
+        'nombre', 'precio','categoria','imagen','cantidad'
+    ];
 
 }

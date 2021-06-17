@@ -1,10 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\ProductController;
 
-Route::get('/', [ProductController::class,'index']);
-Route::get('/productos/{id}', [ProductController::class,'show']);
+Route::get('/',function(){
+    return view('welcome');
+});
+Route::resource('productos', ProductController::class);
 
 Auth::routes();
 
