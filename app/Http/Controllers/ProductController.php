@@ -36,7 +36,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        request()->validate([
+        $request->validate([
             'nombre'=> 'required',
             'precio' => 'required',
             'categoria'=> 'required',
@@ -55,10 +55,10 @@ class ProductController extends Controller
         $product->precio=$price;
         $product->categoria=$category;
         $product->cantidad=$quantity;
-        $product->image='img'.$imageName;
+        $product->image='img/'.$imageName;
 
-        $product->create();
-        $request->image->move(public_path('img',$imageName));
+        $product->save();
+        $request->imagen->move(public_path('img'), $imageName);
 
         return redirect()->route('productos.index')
                         ->with('success','Producto creado correctamente');
@@ -82,9 +82,10 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function edit(Product $product)
+    public function edit($id)
     {
-        return view('productos.edit',compact('product'));
+        
+        return view('productos.edit',compact('id'));
     }
 
     /**
@@ -94,7 +95,7 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
         request()->validate([
             'nombre'=> 'required',
@@ -110,15 +111,15 @@ class ProductController extends Controller
         $quantity=$request->get('cantidad');
         $category=$request->get('categoria');
 
-        $product=new Product();
+        $product=Product::find($id);
         $product->nombre=$name;
         $product->precio=$price;
         $product->categoria=$category;
         $product->cantidad=$quantity;
         $product->image='img'.$imageName;
 
-        $product->update();
-        $request->image->move(public_path('img',$imageName));
+        $product->save();
+        $request->imagen->move(public_path('img'), $imageName);
 
         return redirect()->route('productos.index')
                         ->with('success','Producto actualizado correctamente');
@@ -130,8 +131,9 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
+        $product=Product::find($id);
         $product->delete();
 
 

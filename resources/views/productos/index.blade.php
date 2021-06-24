@@ -43,12 +43,28 @@
                 
                 <a class="btn btn-info" href="{{ route('productos.show',$product->id) }}">Show</a>
                 <a class="btn btn-primary" href="{{ route('productos.edit',$product->id) }}">Edit</a>
-                <a class="btn btn-danger" href="{{ route('productos.destroy',$product->id) }}">Delete</a>
+                <form action="{{ route('productos.destroy',$product->id) }}" method="post">
+                    @csrf
+                    @method('DELETE')
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                </form>
+                <form action="{{route('cart.add')}}" method="post">
+                    @csrf
+                    <input type="hidden" name="producto_id" value="{{$product->_id}}">
+                    <input type="submit" name="btn" class="btn btn-success" value="Agregar al carrito">
+                </form>
+                
                 
 	        </td>
 	    </tr>
 	    @endforeach
     </table>
+        </div>
+        <div class="container">
+            @if (count(Cart::getContent()))
+            <a href="{{route('cart.checkout')}}">VER CARRITO <span class="badge badge-danger">{{count(Cart::getContent())}}</span></a>
+            @endif
+           
         </div>
     </div>
   <!-- Modal -->
@@ -62,44 +78,101 @@
           </button>
         </div>
         <div class="modal-body">
-            <form action="{{ route('productos.store') }}" method="POST">
-                @csrf
-        
-        
-                 <div class="row">
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Name:</strong>
-                            <input type="text" name="name" class="form-control" placeholder="Name">
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Precio:</strong>
-                            <input type="number" name="precio" class="form-control" >
-                            
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Categoria:</strong>
-                            <input type="text" name="categoria" class="form-control" placeholder="Categoria">
-                            
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-group">
-                            <strong>Descripcion:</strong>
-                            
-                            <textarea class="form-control" style="height:150px" name="descripcion" placeholder="Descripcion"></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="col-xs-12 col-sm-12 col-md-12 text-center">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
+
+                <div class="row justify-content-center">
+                    <h2>Nueva Publicación</h2>
                 </div>
-        </div>
+                <div class="row justify-content-center">
+                    @if (count($errors)>0)
+                        <div class="row alert alert-danger">
+                            <p>¡Opsss! Hubo problemas con los dtos proporcionados </p>
+                            <ul>
+                                @foreach ($errors ->all() as $error)
+                                    <li>{{ $error }}</li>
+                                    
+                                @endforeach
+                            </ul>
+                        </div>
+                        
+                    @endif
+                    <form action="{{ route('productos.store') }}" method="post" enctype="multipart/form-data">
+                        @csrf
+                        <div class="form-group">
+                            <label for="nombre" class="col-sm-12 col-form-table">
+                                {{__('Nombre')}}
+                            </label>
+                            <div class="col-sm-12">
+                                <input type="text" id="nombre" name="nombre" class="form-control 
+                                {{ $errors->has('nombre') ? ' is-invalid' : '' }}" value="{{old('nombre') }}" autofocus>
+                                @if ($errors->has('nombre'))
+                                    <span class="invalid-feedback">
+                                        <strong>{{ $errors->first('nombre')}}</strong>
+                                    </span> 
+                                @endif
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="precio" class="col-sm-12 col-form-label">
+                                {{__('Precio')}}
+                            </label>
+                            <div class="col-sm-12">
+                                <input name="precio" id="precio"rows="3" 
+                                class="form-control{{ $errors->has('precio') ?  ' is-invalid' : '' }}" value="{{old('precio')}}">
+                                @if ($errors->has('precio'))
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('precio')}}</strong>
+                                    </span>  
+                                @endif
+                            </div>
+                        </div>
+                        <div class="form-group" >
+                            <label for="categoria" class="col-sm-12 col-form-label">{{__('Categoría')}}</label>
+                            <div class="col-sm-12">
+                                <select class="form-control" name="categoria" id="categoria">
+                                    <option>Celulares</option>
+                                    <option>Desktop</option>
+                                    <option>Accesorios</option>
+                                </select>
+                            </div>
+                            
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="custom-file">
+                                    <input type="file" id="imagen" name="imagen" 
+                                    class="custom-file-input {{ $errors->has('imagen') ? ' is-invalid' : ''}}">
+                                    <label for="customFile" class="custom-file-label">{{__('Choose image')}}</label>
+                                    @if ($errors->has('imagen'))
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $errors->first('imagen')}}</strong>
+                                        </span>   
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cantidad" class="col-sm-12 col-form-label">
+                                {{__('Cantidad')}}
+                            </label>
+                            <div class="col-sm-12">
+                                <input name="cantidad" id="cantidad"rows="3" 
+                                class="form-control{{ $errors->has('cantidad') ?  ' is-invalid' : '' }}" value="{{old('cantidad')}}">
+                                @if ($errors->has('cantidad'))
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('cantidad')}}</strong>
+                                    </span>  
+                                @endif
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <button type="submit" class="btn btn-primary">
+                                    {{__('Create')}}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           <button type="button" class="btn btn-primary">Save changes</button>
@@ -107,6 +180,11 @@
       </div>
     </div>
   </div>
+  <div class="container">
+      
+    
+  </div>
+
     
 
 
